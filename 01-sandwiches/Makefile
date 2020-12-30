@@ -12,7 +12,9 @@ endif
 # call the project makefile!
 include $(OF_ROOT)/libs/openFrameworksCompiled/project/makefileCommon/compile.project.mk
 
-.PHONE: packaged
-packaged: Release
+.PHONY: Packaged
+Packaged: Release
 	cp resources/* ./bin/$(APPNAME).app/Contents/Resources/.
-	ls -l ./bin/$(APPNAME).app/Contents/Resources/.
+
+RunPackaged: Packaged
+	make RunRelease
