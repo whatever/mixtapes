@@ -12,8 +12,17 @@ void ofApp::setup(){
   smoothedVol = 3.0f;
   start = now();
 
-
   setupMicrophone();
+
+
+
+  std::cout << "\n\n";
+  // std::cout << "CWD = " << ofFilePath::getCurrentWorkingDirectory() << "\n";
+  auto videoPath = ofFilePath::getAbsolutePath("../../sea.mp4");
+  std::cout << "Video path = " << videoPath << "\n";
+
+  player.load(videoPath);
+  player.play();
 }
 
 void ofApp::exit(ofEventArgs &args) {
@@ -31,6 +40,8 @@ void ofApp::setupMicrophone() {
   ofSoundStreamSettings settings;
   auto devices = inStream.getMatchingDevices("Microphone");
 
+  std::cout << "Device list:\n";
+
   for (int i=0; i < devices.size(); i++) {
     auto device = devices[i];
     std::cout << i << " " << device.name << "\n";
@@ -38,6 +49,9 @@ void ofApp::setupMicrophone() {
 
   assert(devices.size() > 0);
 
+  std::cout << "\n\n";
+
+  std::cout << "Using \"" << devices[0].name << "\" as input device...\n";
   settings.setInDevice(devices[0]);
 
   settings.setInListener(this);
@@ -52,13 +66,14 @@ void ofApp::setupMicrophone() {
 }
 
 void ofApp::update() {
+  player.update();
   update(getElapsedMillis());
 }
 
 void ofApp::update(unsigned int t) {
   float ts = ((float) getElapsedMillis()) / 1000.0f * 33.0f;
   box.resetTransform();
-  box.setScale(100*smoothedVol);
+  box.setScale(20*smoothedVol);
   box.rotateDeg(+1.0f * ts, ofVec3f(1.0f, 0.0f, 0.0f));
   box.rotateDeg(+5.0f * ts, ofVec3f(0.0f, 1.0f, 0.0f));
   box.rotateDeg(-3.0f * ts, ofVec3f(0.0f, 0.0f, 1.0f));
@@ -67,8 +82,9 @@ void ofApp::update(unsigned int t) {
 void ofApp::draw() {
   ofClear(0);
 
-  // auto devices = soundStream.getMatchingDevices("in");
-  // auto devices = soundStream.getDevicesByApi(ofSoundDevice::Api::PULSE)
+  int h = player.getHeight();
+  int w = player.getWidth();
+  player.draw(0, 0, ofGetWidth(), ofGetHeight());
 
   cam.setGlobalPosition({
     0,
@@ -86,6 +102,7 @@ void ofApp::draw() {
 
   // End
   cam.end();
+
 }
 
 unsigned int ofApp::getElapsedMillis() {
@@ -96,29 +113,25 @@ void ofApp::audioIn(ofSoundBuffer & input){
 
 	float curVol = 0.0;
 
-	//lets go through each sample and calculate the root mean square which is a rough way to calculate volume
 	for (size_t i = 0; i < input.getNumFrames(); i++){
-		left[i]		= input[i*2]*0.5f;
-		right[i]	= input[i*2+1]*0.5;
+		left[i]		= input[i*2+0]*0.5f;
+		right[i]	= input[i*2+1]*0.5f;
 
 		curVol += left[i] * left[i];
 		curVol += right[i] * right[i];
 	}
 
-	// this is how we get the mean of rms :)
 	curVol /= (float) (2*input.getNumFrames());
-
-	// this is how we get the root of rms :)
 	curVol = std::min(1.0f, sqrt(curVol));
-
-  // std::cout << "num frames = " << input.size() << " " << input.getNumFrames() << "\n";
 
   if (input.getNumFrames() == 0) {
     std::cout << "Num frames is zero!\n";
   }
 
   smoothedVol = 0.7f*smoothedVol + 0.3f*curVol;
-  smoothedVol = std::min(1.0f, smoothedVol);
+  smoothedVol = std::min(1.00f, smoothedVol);
+  smoothedVol = std::max(0.01f, smoothedVol);
+  smoothedVol = 0.05f;
 }
 
 void ofApp::keyPressed(int key) { }
