@@ -28,12 +28,8 @@ void ofApp::setupMicrophone() {
   right.assign(bufferSize, 0.0);
   volHistory.assign(400, 0.0);
 
-
-
   ofSoundStreamSettings settings;
   auto devices = inStream.getMatchingDevices("Microphone");
-
-  inStream.printDeviceList();
 
   for (int i=0; i < devices.size(); i++) {
     auto device = devices[i];
@@ -100,27 +96,29 @@ void ofApp::audioIn(ofSoundBuffer & input){
 
 	float curVol = 0.0;
 
-	// samples are "interleaved"
-	int numCounted = 0;
-
 	//lets go through each sample and calculate the root mean square which is a rough way to calculate volume
 	for (size_t i = 0; i < input.getNumFrames(); i++){
-		left[i]		= input[i*2]*0.5;
+		left[i]		= input[i*2]*0.5f;
 		right[i]	= input[i*2+1]*0.5;
 
 		curVol += left[i] * left[i];
 		curVol += right[i] * right[i];
-		numCounted+=2;
 	}
 
 	// this is how we get the mean of rms :)
-	curVol /= (float) numCounted;
+	curVol /= (float) (2*input.getNumFrames());
 
 	// this is how we get the root of rms :)
-	curVol = sqrt( curVol );
+	curVol = std::min(1.0f, sqrt(curVol));
 
-	// smoothedVol *= 0.93;
-  smoothedVol = 0.8f*smoothedVol + 0.2f*curVol;
+  // std::cout << "num frames = " << input.size() << " " << input.getNumFrames() << "\n";
+
+  if (input.getNumFrames() == 0) {
+    std::cout << "Num frames is zero!\n";
+  }
+
+  smoothedVol = 0.7f*smoothedVol + 0.3f*curVol;
+  smoothedVol = std::min(1.0f, smoothedVol);
 }
 
 void ofApp::keyPressed(int key) { }
