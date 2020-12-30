@@ -118,11 +118,9 @@ void ofApp::update(unsigned int t) {
   box.rotateDeg(+5.0f * ts, ofVec3f(0.0f, 1.0f, 0.0f));
   box.rotateDeg(-3.0f * ts, ofVec3f(0.0f, 0.0f, 1.0f));
 
-  speed = 0.8f + (5.0f*smoothedVol - 0.1f - 0.3f);
+  speed = 0.3f + 7.0f*smoothedVol;
   // speed = std::max(0.0f, speed);
   player.setSpeed(speed);
-
-
 }
 
 void ofApp::drawFooter() {
