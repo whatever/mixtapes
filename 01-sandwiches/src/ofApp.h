@@ -20,15 +20,26 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
+    void audioIn(ofSoundBuffer & input);
+
     // ...
+    void exit(ofEventArgs &args);
 
 		void update(unsigned int t);
+		void setupMicrophone();
 
     unsigned int getElapsedMillis();
 
   protected:
+
+    vector <float> left;
+		vector <float> right;
+		vector <float> volHistory;
+
     unsigned int start;
+    float smoothedVol;
 
     ofEasyCam cam;
     ofBoxPrimitive box;
+    ofSoundStream inStream;
 };
