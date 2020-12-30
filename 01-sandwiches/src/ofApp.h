@@ -28,15 +28,24 @@ class ofApp : public ofBaseApp{
 
 		void update(unsigned int t);
 		void setupMicrophone();
+		void setupRecorder();
 
     unsigned int getElapsedMillis();
 
+
+
+    void drawFooter();
+
   protected:
+
+    size_t frameWidth, frameHeight;
 
     vector <float> left;
 		vector <float> right;
 		vector <float> volHistory;
 
+    // ...
+    float speed;
     unsigned int start;
     float smoothedVol;
 
@@ -45,5 +54,10 @@ class ofApp : public ofBaseApp{
     ofSoundStream inStream;
     ofVideoPlayer player;
 
-    float speed;
+    ofFbo fbo;
+    ofPixels pixels;
+
+    // Recorder stuff
+    ofxVideoRecorder recorder;
+    void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
 };

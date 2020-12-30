@@ -1,6 +1,6 @@
-#include "ofApp.h"
-
 #include <chrono>
+
+#include "ofApp.h"
 
 unsigned int now() {
    using namespace std::chrono;
@@ -8,6 +8,15 @@ unsigned int now() {
 }
 
 void ofApp::setup(){
+
+  frameWidth = ofGetWidth();
+  frameHeight = ofGetHeight();
+
+  // ...
+  ofSetFrameRate(30);
+
+  // ...
+  setupRecorder();
 
   std::cout << "XYZ\n";
   std::cout << "\n\n\n";
@@ -34,9 +43,26 @@ void ofApp::setup(){
   player.play();
 }
 
+void ofApp::setupRecorder() {
+
+  // 
+  fbo.allocate(frameWidth, frameHeight, GL_RGB);
+
+  recorder.setVideoCodec("mpeg4");
+  recorder.setVideoBitrate("800k");
+  ofAddListener(recorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
+  recorder.setup("../../recorded.mov", frameWidth, frameHeight, 30);
+  recorder.start();
+}
+
 void ofApp::exit(ofEventArgs &args) {
+  ofRemoveListener(recorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
+  recorder.close();
   inStream.stop();
   inStream.close();
+}
+
+void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args) {
 }
 
 void ofApp::setupMicrophone() {
@@ -77,6 +103,10 @@ void ofApp::setupMicrophone() {
 void ofApp::update() {
   player.update();
   update(getElapsedMillis());
+
+  if (recorder.isInitialized()) {
+    recorder.addFrame(pixels);
+  }
 }
 
 void ofApp::update(unsigned int t) {
@@ -91,29 +121,11 @@ void ofApp::update(unsigned int t) {
   speed = 0.8f + (5.0f*smoothedVol - 0.1f - 0.3f);
   // speed = std::max(0.0f, speed);
   player.setSpeed(speed);
+
+
 }
 
-void ofApp::draw() {
-  ofClear(0);
-  ofSetColor(255);
-
-  player.draw(0, 0, ofGetWidth(), ofGetHeight());
-
-  cam.setGlobalPosition({
-    0,
-    0,
-    cam.getImagePlaneDistance(ofGetCurrentViewport())
-  });
-
-  // Begin
-  cam.begin();
-
-    box.draw();
-
-  // End
-  cam.end();
-
-
+void ofApp::drawFooter() {
   // Draw footer
   ofSetColor(1);
   int h = 50;
@@ -125,6 +137,35 @@ void ofApp::draw() {
   ofSetColor(255);
   ofDrawBitmapString("vol = " + to_string(speed), x+10, y+h-30);
   ofDrawBitmapString("elp = " + to_string(getElapsedMillis()), x+10, y+h-10);
+}
+
+void ofApp::draw() {
+  ofClear(0);
+  ofSetColor(255);
+
+  cam.setGlobalPosition({
+    0,
+    0,
+    cam.getImagePlaneDistance(ofGetCurrentViewport())
+  });
+
+  // Begin
+  cam.begin();
+    // box.draw();
+  cam.end();
+
+
+  fbo.begin();
+    ofClear(255, 255, 255, 0);
+    ofSetColor(255, 255, 255);
+    player.draw(0, 0, frameWidth, frameHeight);
+    drawFooter();
+  fbo.end();
+
+  fbo.readToPixels(pixels);
+
+  fbo.draw(0, 0);
+
 }
 
 unsigned int ofApp::getElapsedMillis() {
