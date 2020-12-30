@@ -9,11 +9,14 @@ unsigned int now() {
 
 void ofApp::setup(){
 
+  std::cout << "XYZ\n";
+  std::cout << "\n\n\n";
+
+  speed = 1.0f;
   smoothedVol = 3.0f;
   start = now();
 
   setupMicrophone();
-
 
 
   std::cout << "\n\n";
@@ -50,7 +53,7 @@ void ofApp::setupMicrophone() {
 
   for (int i=0; i < devices.size(); i++) {
     auto device = devices[i];
-    std::cout << i << " " << device.name << "\n";
+    std::cout << " " << i << ") " << device.name << "\n";
   }
 
   assert(devices.size() > 0);
@@ -77,19 +80,23 @@ void ofApp::update() {
 }
 
 void ofApp::update(unsigned int t) {
+  float u = ((float) getElapsedMillis()) / 1000.0f / 1.0f;
   float ts = ((float) getElapsedMillis()) / 1000.0f * 33.0f;
   box.resetTransform();
-  box.setScale(20*smoothedVol);
+  box.setScale(smoothedVol);
   box.rotateDeg(+1.0f * ts, ofVec3f(1.0f, 0.0f, 0.0f));
   box.rotateDeg(+5.0f * ts, ofVec3f(0.0f, 1.0f, 0.0f));
   box.rotateDeg(-3.0f * ts, ofVec3f(0.0f, 0.0f, 1.0f));
+
+  speed = 0.8f + (5.0f*smoothedVol - 0.1f - 0.3f);
+  // speed = std::max(0.0f, speed);
+  player.setSpeed(speed);
 }
 
 void ofApp::draw() {
   ofClear(0);
+  ofSetColor(255);
 
-  int h = player.getHeight();
-  int w = player.getWidth();
   player.draw(0, 0, ofGetWidth(), ofGetHeight());
 
   cam.setGlobalPosition({
@@ -103,12 +110,21 @@ void ofApp::draw() {
 
     box.draw();
 
-    ofDrawBitmapString(to_string(smoothedVol), 100, 50);
-    ofDrawBitmapString(to_string(getElapsedMillis()), 100, 100);
-
   // End
   cam.end();
 
+
+  // Draw footer
+  ofSetColor(1);
+  int h = 50;
+  int w = ofGetViewportWidth();
+  int x = 0;
+  int y = ofGetViewportHeight()-h;
+  ofDrawRectangle(x, y, w, h);
+
+  ofSetColor(255);
+  ofDrawBitmapString("vol = " + to_string(speed), x+10, y+h-30);
+  ofDrawBitmapString("elp = " + to_string(getElapsedMillis()), x+10, y+h-10);
 }
 
 unsigned int ofApp::getElapsedMillis() {
@@ -119,25 +135,15 @@ void ofApp::audioIn(ofSoundBuffer & input){
 
 	float curVol = 0.0;
 
-	for (size_t i = 0; i < input.getNumFrames(); i++){
-		left[i]		= input[i*2+0]*0.5f;
-		right[i]	= input[i*2+1]*0.5f;
-
-		curVol += left[i] * left[i];
-		curVol += right[i] * right[i];
-	}
-
-	curVol /= (float) (2*input.getNumFrames());
-	curVol = std::min(1.0f, sqrt(curVol));
-
-  if (input.getNumFrames() == 0) {
-    std::cout << "Num frames is zero!\n";
+  float v = 0.0f;
+  for (size_t i=0; i < input.size(); i++) {
+    v += input[i]*input[i];
   }
 
-  smoothedVol = 0.7f*smoothedVol + 0.3f*curVol;
-  smoothedVol = std::min(1.00f, smoothedVol);
-  smoothedVol = std::max(0.01f, smoothedVol);
-  smoothedVol = 0.05f;
+  v /= (float) input.size();
+  v = sqrt(v);
+  smoothedVol = 0.1f*smoothedVol + 0.9f*v;
+
 }
 
 void ofApp::keyPressed(int key) { }
