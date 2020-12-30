@@ -17,8 +17,14 @@ void ofApp::setup(){
 
 
   std::cout << "\n\n";
-  // std::cout << "CWD = " << ofFilePath::getCurrentWorkingDirectory() << "\n";
-  auto videoPath = ofFilePath::getAbsolutePath("../../sea.mp4");
+
+  string newRoot = "../Resources";
+  ofEnableDataPath();
+  ofSetDataPathRoot(newRoot);
+
+  auto videoPath = ofFilePath::getCurrentWorkingDirectory();
+  videoPath = ofFilePath::join(videoPath, "sea.mp4");
+  videoPath = ofFilePath::getAbsolutePath(videoPath);
   std::cout << "Video path = " << videoPath << "\n";
 
   player.load(videoPath);
