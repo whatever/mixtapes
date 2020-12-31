@@ -18,3 +18,9 @@ Packaged: Release
 
 RunPackaged: Packaged
 	make RunRelease
+
+
+ayyy:
+	rm -fr recorded.mov
+	make RunPackaged
+	open recorded.mov

@@ -40,10 +40,6 @@ class ofApp : public ofBaseApp{
 
     size_t frameWidth, frameHeight;
 
-    vector <float> left;
-		vector <float> right;
-		vector <float> volHistory;
-
     // ...
     float speed;
     unsigned int start;
@@ -60,4 +56,6 @@ class ofApp : public ofBaseApp{
     // Recorder stuff
     ofxVideoRecorder recorder;
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
+
+    ofShader shader;
 };

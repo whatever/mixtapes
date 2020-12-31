@@ -9,30 +9,39 @@ unsigned int now() {
 
 void ofApp::setup(){
 
+  // Set data root
+  string newRoot = "../Resources";
+  ofEnableDataPath();
+  ofSetDataPathRoot(newRoot);
+
+  // Framerate
+  ofSetFrameRate(30);
+
+  // WxH
   frameWidth = ofGetWidth();
   frameHeight = ofGetHeight();
 
   // ...
-  ofSetFrameRate(30);
-
-  // ...
   setupRecorder();
 
-  std::cout << "XYZ\n";
+  std::cout << "01 Mixtape\n";
   std::cout << "\n\n\n";
 
-  speed = 1.0f;
+  speed = 0.0f;
   smoothedVol = 3.0f;
   start = now();
 
   setupMicrophone();
 
-
   std::cout << "\n\n";
 
-  string newRoot = "../Resources";
-  ofEnableDataPath();
-  ofSetDataPathRoot(newRoot);
+  std::cout << "Loading shader...\n";
+
+  if (shader.load("pass.vert", "pass.frag")) {
+    std::cout << "Shader successfully loaded!\n";
+  }
+
+  std::cout << "Finished loading shader...\n";
 
   auto videoPath = ofFilePath::getCurrentWorkingDirectory();
   videoPath = ofFilePath::join(videoPath, "sea.mp4");
@@ -51,7 +60,7 @@ void ofApp::setupRecorder() {
   recorder.setVideoCodec("mpeg4");
   recorder.setVideoBitrate("800k");
   ofAddListener(recorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
-  recorder.setup("../../recorded.mov", frameWidth, frameHeight, 30);
+  recorder.setup("../../../../recorded.mov", frameWidth, frameHeight, 30);
   recorder.start();
 }
 
@@ -68,9 +77,6 @@ void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args)
 void ofApp::setupMicrophone() {
 
   int bufferSize = 256;
-  left.assign(bufferSize, 0.0);
-  right.assign(bufferSize, 0.0);
-  volHistory.assign(400, 0.0);
 
   ofSoundStreamSettings settings;
   auto devices = inStream.getMatchingDevices("Microphone");
