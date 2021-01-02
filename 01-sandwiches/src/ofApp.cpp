@@ -24,8 +24,10 @@ void ofApp::setup(){
   // ...
   setupRecorder();
 
-  std::cout << "01 Mixtape\n";
-  std::cout << "\n\n\n";
+  auto renderer = ofGetGLRenderer();
+  std::cout << "01 Mixtape; "
+    << "OpenGL = " << renderer->getGLVersionMajor() << "." << renderer->getGLVersionMinor()
+    << "\n\n\n\n";
 
   speed = 0.0f;
   smoothedVol = 3.0f;
@@ -37,7 +39,7 @@ void ofApp::setup(){
 
   std::cout << "Loading shader...\n";
 
-  if (shader.load("pass.vert", "pass.frag")) {
+  if (shader.load("lum.vert", "lum.frag")) {
     std::cout << "Shader successfully loaded!\n";
   }
 
@@ -119,7 +121,8 @@ void ofApp::update(unsigned int t) {
   float u = ((float) getElapsedMillis()) / 1000.0f / 1.0f;
   float ts = ((float) getElapsedMillis()) / 1000.0f * 33.0f;
   box.resetTransform();
-  box.setScale(smoothedVol);
+  // box.setScale(smoothedVol);
+  box.setScale(1.0f);
   box.rotateDeg(+1.0f * ts, ofVec3f(1.0f, 0.0f, 0.0f));
   box.rotateDeg(+5.0f * ts, ofVec3f(0.0f, 1.0f, 0.0f));
   box.rotateDeg(-3.0f * ts, ofVec3f(0.0f, 0.0f, 1.0f));
@@ -153,14 +156,9 @@ void ofApp::draw() {
     cam.getImagePlaneDistance(ofGetCurrentViewport())
   });
 
-  // Begin
-  cam.begin();
-    // box.draw();
-  cam.end();
-
 
   fbo.begin();
-    ofClear(255, 255, 255, 0);
+    ofClear(255, 255, 255, 255);
     ofSetColor(255, 255, 255);
     player.draw(0, 0, frameWidth, frameHeight);
     drawFooter();
@@ -168,8 +166,17 @@ void ofApp::draw() {
 
   fbo.readToPixels(pixels);
 
+  /*
+  shader.begin();
   fbo.draw(0, 0);
+  shader.end();
+  */
 
+  cam.begin();
+  shader.begin();
+    box.draw();
+  shader.end();
+  cam.end();
 }
 
 unsigned int ofApp::getElapsedMillis() {

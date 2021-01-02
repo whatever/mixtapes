@@ -21,4 +21,5 @@ void main () {
   color += texture2D(texture, coord - vec2(0, offset[2])*s) * weight[2];
   
   gl_FragColor = color;
+  gl_FragColor = vec4(1.0f, 1.0f, 1.0f, 0.5f);
 }
