@@ -3,17 +3,20 @@
 in vec2 varyingtexcoord;
 out vec4 outputColor;
 
-uniform sampler2DRect tex;
+uniform sampler2DRect tex0;
+uniform sampler2DRect tex1;
 uniform float alpha;
 
 void main() {
   vec2 pos = gl_FragCoord.xy;
-  vec4 color = texture(tex, varyingtexcoord);
+  vec4 color = texture(tex0, varyingtexcoord);
+  vec4 color2 = texture(tex1, varyingtexcoord);
 
-  float r = color.r;
-  float b = color.b;
+  float r = color2.r;
+  float b = color2.b;
 
-  color.r = alpha * r + (1-alpha) * b;
-  color.b = (1-alpha) * r + alpha * b;
-  outputColor = color;
+  color2.r = alpha * r + (1-alpha) * b;
+  color2.b = (1-alpha) * r + alpha * b;
+
+  outputColor = color + color2;
 }
