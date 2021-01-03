@@ -186,13 +186,21 @@ void ofApp::draw() {
 
   fbo.readToPixels(pixels);
 
+  ofTexture tex = fbo.getTexture();
+  ofMesh mesh = videoMesh(tex);
 
+  shader.begin();
+  shader.setUniformTexture("tex0", fbo.getTexture(), 0);
+  shader.setUniformTexture("tex1", bgs[0].getTexture(), 1);
+  shader.setUniform1f("alpha", smoothedVol);
+  mesh.draw();
+  shader.end();
+}
+
+ofMesh ofApp::videoMesh(ofTexture tex) {
+  ofMesh mesh;
   float h = frameHeight;
   float w = frameWidth;
-
-  ofMesh mesh;
-  ofTexture tex = fbo.getTexture();
-
   auto nw = tex.getCoordFromPercent(0.0f, 0.0f);
   auto ne = tex.getCoordFromPercent(1.0f, 0.0f);
   auto se = tex.getCoordFromPercent(1.0f, 1.0f);
@@ -221,17 +229,6 @@ void ofApp::draw() {
   // 2
   mesh.addVertex(ofPoint(w, h));
   mesh.addTexCoord(se);
-
-  shader.begin();
-  shader.setUniformTexture("tex0", fbo.getTexture(), 0);
-  shader.setUniformTexture("tex1", bgs[0].getTexture(), 1);
-  shader.setUniform1f("alpha", smoothedVol);
-  mesh.draw();
-  shader.end();
-}
-
-ofMesh videoFrame(ofTexture) {
-  ofMesh mesh;
   return mesh;
 }
 

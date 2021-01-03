@@ -34,6 +34,7 @@ class ofApp : public ofBaseApp{
 
 
 
+    ofMesh videoMesh(ofTexture tex);
     void drawFooter();
 
   protected:
