@@ -39,7 +39,7 @@ void ofApp::setup(){
 
   std::cout << "Loading shader...\n";
 
-  if (shader.load("lum.vert", "lum.frag")) {
+  if (shader.load("video.vert", "video.frag")) {
     std::cout << "Shader successfully loaded!\n";
   }
 
@@ -118,7 +118,6 @@ void ofApp::update() {
 }
 
 void ofApp::update(unsigned int t) {
-  float u = ((float) getElapsedMillis()) / 1000.0f / 1.0f;
   float ts = ((float) getElapsedMillis()) / 1000.0f * 33.0f;
   box.resetTransform();
   // box.setScale(smoothedVol);
@@ -127,7 +126,7 @@ void ofApp::update(unsigned int t) {
   box.rotateDeg(+5.0f * ts, ofVec3f(0.0f, 1.0f, 0.0f));
   box.rotateDeg(-3.0f * ts, ofVec3f(0.0f, 0.0f, 1.0f));
 
-  speed = 0.3f + 7.0f*smoothedVol;
+  speed = 1.0f + 7.0f*smoothedVol;
   // speed = std::max(0.0f, speed);
   player.setSpeed(speed);
 }
@@ -158,25 +157,67 @@ void ofApp::draw() {
 
 
   fbo.begin();
+
+    // Clear
+    ofDisableDepthTest();
+
+    // Draw video in background
     ofClear(255, 255, 255, 255);
     ofSetColor(255, 255, 255);
     player.draw(0, 0, frameWidth, frameHeight);
     drawFooter();
+
+    // Draw 3D stuff
+    ofEnableDepthTest();
+    cam.begin();
+    box.draw();
+    cam.end();
+
   fbo.end();
 
   fbo.readToPixels(pixels);
 
-  /*
-  shader.begin();
-  fbo.draw(0, 0);
-  shader.end();
-  */
 
-  cam.begin();
+  float h = frameHeight;
+  float w = frameWidth;
+
+  ofMesh mesh;
+  ofTexture tex = fbo.getTexture();
+
+  // 0
+  mesh.addVertex(ofPoint(0.0f, 0.0f));
+  mesh.addTexCoord(tex.getCoordFromPercent(0.0f, 0.0f));
+
+  // 1
+  mesh.addVertex(ofPoint(w, 0.0f));
+  mesh.addTexCoord(tex.getCoordFromPercent(1.0f, 0.0f));
+
+  // 3
+  mesh.addVertex(ofPoint(0.0f, h));
+  mesh.addTexCoord(tex.getCoordFromPercent(0.0f, 1.0f));
+
+  // 1
+  mesh.addVertex(ofPoint(w, 0.0f));
+  mesh.addTexCoord(tex.getCoordFromPercent(1.0f, 0.0f));
+
+  // 3
+  mesh.addVertex(ofPoint(0.0f, h));
+  mesh.addTexCoord(tex.getCoordFromPercent(0.0f, 1.0f));
+
+  // 2
+  mesh.addVertex(ofPoint(w, h));
+  mesh.addTexCoord(tex.getCoordFromPercent(1.0f, 1.0f));
+
+  // tex.bind();
   shader.begin();
-    box.draw();
+  shader.setUniformTexture("tex", fbo.getTextureReference(), 0);
+  shader.setUniform1f("alpha", smoothedVol);
+  mesh.draw();
   shader.end();
-  cam.end();
+  tex.unbind();
+
+  // fbo.draw(0, 0);
+
 }
 
 unsigned int ofApp::getElapsedMillis() {
@@ -184,8 +225,6 @@ unsigned int ofApp::getElapsedMillis() {
 }
 
 void ofApp::audioIn(ofSoundBuffer & input){
-
-	float curVol = 0.0;
 
   float v = 0.0f;
   for (size_t i=0; i < input.size(); i++) {

@@ -1,7 +1,6 @@
 #version 120
 
 void main () {
-  vec2 pos = gl_FragCoord.xy;
-  vec2 xy = vec2(0.2f, 0.5f);
-  gl_FragColor = vec4(xy, 1.0f, 1.0f);
+  vec2 pos = gl_TexCoord[0].xy;
+  gl_FragColor = vec4(pos, 0.0f, 1.0f);
 }
