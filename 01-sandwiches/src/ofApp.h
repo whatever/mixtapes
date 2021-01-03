@@ -49,7 +49,8 @@ class ofApp : public ofBaseApp{
     ofBoxPrimitive box;
     ofSoundStream inStream;
     ofVideoPlayer player;
-    ofVideoPlayer bg;
+
+    ofVideoPlayer bgs[4];
 
     ofFbo fbo;
     ofPixels pixels;

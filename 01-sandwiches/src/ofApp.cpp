@@ -53,8 +53,10 @@ void ofApp::setup(){
   player.load(videoPath);
   player.play();
 
-  bg.load(videoPath);
-  bg.play();
+  for (int i=0; i < 4; i++) {
+    bgs[i].load(videoPath);
+    bgs[i].play();
+  }
 }
 
 void ofApp::setupRecorder() {
@@ -113,7 +115,10 @@ void ofApp::setupMicrophone() {
 
 void ofApp::update() {
   player.update();
-  bg.update();
+
+  for (int i=0; i < 4; i++) {
+    bgs[i].update();
+  }
 
   update(getElapsedMillis());
 
@@ -217,14 +222,17 @@ void ofApp::draw() {
   mesh.addVertex(ofPoint(w, h));
   mesh.addTexCoord(se);
 
-  ofTexture bgtex = bg.getTexture();
-
   shader.begin();
   shader.setUniformTexture("tex0", fbo.getTexture(), 0);
-  shader.setUniformTexture("tex1", bgtex, 1);
+  shader.setUniformTexture("tex1", bgs[0].getTexture(), 1);
   shader.setUniform1f("alpha", smoothedVol);
   mesh.draw();
   shader.end();
+}
+
+ofMesh videoFrame(ofTexture) {
+  ofMesh mesh;
+  return mesh;
 }
 
 unsigned int ofApp::getElapsedMillis() {
