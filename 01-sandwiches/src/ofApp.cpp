@@ -184,29 +184,41 @@ void ofApp::draw() {
   ofMesh mesh;
   ofTexture tex = fbo.getTexture();
 
+  /*
+  auto nw = tex.getCoordFromPercent(1.0f, 1.0f);
+  auto ne = tex.getCoordFromPercent(0.0f, 1.0f);
+  auto se = tex.getCoordFromPercent(0.0f, 0.0f);
+  auto sw = tex.getCoordFromPercent(1.0f, 0.0f);
+  */
+
+  auto nw = tex.getCoordFromPercent(0.0f, 0.0f);
+  auto ne = tex.getCoordFromPercent(1.0f, 0.0f);
+  auto se = tex.getCoordFromPercent(1.0f, 1.0f);
+  auto sw = tex.getCoordFromPercent(0.0f, 1.0f);
+
   // 0
   mesh.addVertex(ofPoint(0.0f, 0.0f));
-  mesh.addTexCoord(tex.getCoordFromPercent(0.0f, 0.0f));
+  mesh.addTexCoord(nw);
 
   // 1
   mesh.addVertex(ofPoint(w, 0.0f));
-  mesh.addTexCoord(tex.getCoordFromPercent(1.0f, 0.0f));
+  mesh.addTexCoord(ne);
 
   // 3
   mesh.addVertex(ofPoint(0.0f, h));
-  mesh.addTexCoord(tex.getCoordFromPercent(0.0f, 1.0f));
+  mesh.addTexCoord(sw);
 
   // 1
   mesh.addVertex(ofPoint(w, 0.0f));
-  mesh.addTexCoord(tex.getCoordFromPercent(1.0f, 0.0f));
+  mesh.addTexCoord(ne);
 
   // 3
   mesh.addVertex(ofPoint(0.0f, h));
-  mesh.addTexCoord(tex.getCoordFromPercent(0.0f, 1.0f));
+  mesh.addTexCoord(sw);
 
   // 2
   mesh.addVertex(ofPoint(w, h));
-  mesh.addTexCoord(tex.getCoordFromPercent(1.0f, 1.0f));
+  mesh.addTexCoord(se);
 
   // tex.bind();
   shader.begin();

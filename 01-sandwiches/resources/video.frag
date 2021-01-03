@@ -8,7 +8,7 @@ uniform float alpha;
 
 void main() {
   vec2 pos = gl_FragCoord.xy;
-  vec4 color = texture(tex, pos);
+  vec4 color = texture(tex, varyingtexcoord);
   color.r = alpha;
   outputColor = color;
 }
