@@ -126,9 +126,9 @@ void ofApp::update(unsigned int t) {
   box.rotateDeg(+5.0f * ts, ofVec3f(0.0f, 1.0f, 0.0f));
   box.rotateDeg(-3.0f * ts, ofVec3f(0.0f, 0.0f, 1.0f));
 
-  speed = 1.0f + 7.0f*smoothedVol;
+  speed = 0.3f + 4.0f*smoothedVol;
   // speed = std::max(0.0f, speed);
-  player.setSpeed(speed);
+  player.setSpeed(speed/2.0f);
 }
 
 void ofApp::drawFooter() {
@@ -170,7 +170,7 @@ void ofApp::draw() {
     // Draw 3D stuff
     ofEnableDepthTest();
     cam.begin();
-    box.draw();
+    // box.draw();
     cam.end();
 
   fbo.end();
@@ -183,13 +183,6 @@ void ofApp::draw() {
 
   ofMesh mesh;
   ofTexture tex = fbo.getTexture();
-
-  /*
-  auto nw = tex.getCoordFromPercent(1.0f, 1.0f);
-  auto ne = tex.getCoordFromPercent(0.0f, 1.0f);
-  auto se = tex.getCoordFromPercent(0.0f, 0.0f);
-  auto sw = tex.getCoordFromPercent(1.0f, 0.0f);
-  */
 
   auto nw = tex.getCoordFromPercent(0.0f, 0.0f);
   auto ne = tex.getCoordFromPercent(1.0f, 0.0f);
