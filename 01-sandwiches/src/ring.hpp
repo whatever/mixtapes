@@ -21,9 +21,9 @@ class Ring {
         meshes[i].resetTransform();
         meshes[i].setScale(0.25f);
         meshes[i].setPosition(x, y, z);
-        meshes[i].rotateDeg(+1.0f * 8 * u, ofVec3f(1.0f, 0.0f, 0.0f));
-        meshes[i].rotateDeg(+5.0f * 8 * u, ofVec3f(0.0f, 1.0f, 0.0f));
-        meshes[i].rotateDeg(-3.0f * 8 * u, ofVec3f(0.0f, 0.0f, 1.0f));
+        meshes[i].rotateDeg(+1.0f * 8 * u + i, ofVec3f(1.0f, 0.0f, 0.0f));
+        meshes[i].rotateDeg(+5.0f * 8 * u + i, ofVec3f(0.0f, 1.0f, 0.0f));
+        meshes[i].rotateDeg(-3.0f * 8 * u + i, ofVec3f(0.0f, 0.0f, 1.0f));
       }
     };
 
