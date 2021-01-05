@@ -141,7 +141,8 @@ void ofApp::update(unsigned int t) {
 }
 
 void ofApp::drawFooter() {
-  // Draw footer
+  ofDisableDepthTest();
+
   ofSetColor(1);
   int h = 50;
   int w = ofGetViewportWidth();
@@ -174,27 +175,42 @@ void ofApp::draw() {
     ofClear(255, 255, 255, 255);
     ofSetColor(255, 255, 255);
     player.draw(0, 0, frameWidth, frameHeight);
-    drawFooter();
-
-    // Draw 3D stuff
-    ofEnableDepthTest();
-    cam.begin();
-    // box.draw();
-    cam.end();
 
   fbo.end();
-
-  fbo.readToPixels(pixels);
 
   ofTexture tex = fbo.getTexture();
   ofMesh mesh = videoMesh(tex);
 
-  shader.begin();
-  shader.setUniformTexture("tex0", fbo.getTexture(), 0);
-  shader.setUniformTexture("tex1", bgs[0].getTexture(), 1);
-  shader.setUniform1f("alpha", smoothedVol);
-  mesh.draw();
-  shader.end();
+  ofFbo t;
+  t.allocate(frameWidth, frameHeight, GL_RGB);
+  t.begin();
+
+  {
+    ofClear(255, 255, 255, 255);
+    ofSetColor(255, 255, 255);
+    shader.begin();
+    shader.setUniformTexture("tex0", fbo.getTexture(), 0);
+    shader.setUniformTexture("tex1", bgs[0].getTexture(), 1);
+    shader.setUniform1f("alpha", smoothedVol);
+    mesh.draw();
+    shader.end();
+  }
+
+  { // Draw 3D stuff
+    ofEnableDepthTest();
+    cam.begin();
+    box.draw();
+    cam.end();
+  }
+
+  { // Draw Footer
+    drawFooter();
+  }
+
+  t.end();
+
+  t.draw(0, 0, frameWidth, frameHeight);
+  t.readToPixels(pixels);
 }
 
 ofMesh ofApp::videoMesh(ofTexture tex) {

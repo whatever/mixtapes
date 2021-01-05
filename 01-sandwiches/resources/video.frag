@@ -18,5 +18,5 @@ void main() {
   color2.r = alpha * r + (1-alpha) * b;
   color2.b = (1-alpha) * r + alpha * b;
 
-  outputColor = color + color2;
+  outputColor = 0.5*color + 0.5*color2;
 }
