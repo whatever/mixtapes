@@ -43,30 +43,11 @@ float lum(vec4 rgba) {
   );
 }
 
+vec4 whiff(sampler2DRect target, sampler2DRect mask, vec2 pos) {
+  float z = 1.0f/6.0f/lum(texture(mask, pos));
+  return expanded(target, pos, z);
+}
+
 void main() {
-  vec2 pos = varyingtexcoord;
-  vec4 color2 = texture(tex1, pos);
-
-  // float z = 1.0f/(1.0f - lum(color2)); // 0.1f/(10.f*lum(color2));
-  float z = 1.0f/6.0f/lum(color2); // 0.1f/(10.f*lum(color2));
-
-  /*
-  vec2 p = pos;
-  p.x /= 1080*0.3 * 1.0f;
-  p.y /= 1920*0.3 * 1.0f;
-  z = sqrt(p.x*p.x + p.y+p.y + 0.00000001f);
-  */
-
-  vec4 color = expanded(tex0, pos, z);
-  // vec4 color = vec4(z*texture(tex0, pos).rgb, 1.0f);
-
-
-  float r = color2.r;
-  float b = color2.b;
-
-  color2.r = alpha * r + (1-alpha) * b;
-  color2.b = (1-alpha) * r + alpha * b;
-
-  // outputColor = (0.5*color + 0.5*color2);
-  outputColor = color;
+  outputColor = whiff(tex0, tex1, varyingtexcoord);
 }
