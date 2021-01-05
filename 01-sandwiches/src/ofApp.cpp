@@ -2,6 +2,8 @@
 
 #include "ofApp.h"
 
+#define FPS 60
+
 unsigned int now() {
    using namespace std::chrono;
    return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
@@ -15,11 +17,12 @@ void ofApp::setup(){
   ofSetDataPathRoot(newRoot);
 
   // Framerate
-  ofSetFrameRate(30);
+  ofSetFrameRate(FPS);
 
   // WxH
   frameWidth = ofGetWidth();
   frameHeight = ofGetHeight();
+  fbo.allocate(frameWidth, frameHeight, GL_RGB);
 
   // ...
   setupRecorder();
@@ -60,14 +63,10 @@ void ofApp::setup(){
 }
 
 void ofApp::setupRecorder() {
-
-  // 
-  fbo.allocate(frameWidth, frameHeight, GL_RGB);
-
   recorder.setVideoCodec("mpeg4");
-  recorder.setVideoBitrate("800k");
+  recorder.setVideoBitrate("1800k");
   ofAddListener(recorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
-  recorder.setup("../../../../recorded.mov", frameWidth, frameHeight, 30);
+  recorder.setup("../../../../recorded.mov", frameWidth, frameHeight, FPS);
   recorder.start();
 }
 
@@ -121,6 +120,7 @@ void ofApp::update() {
   }
 
   update(getElapsedMillis());
+  ring.update(getElapsedMillis());
 
   if (recorder.isInitialized()) {
     recorder.addFrame(pixels);
@@ -199,7 +199,8 @@ void ofApp::draw() {
   { // Draw 3D stuff
     ofEnableDepthTest();
     cam.begin();
-    box.draw();
+    // box.draw();
+    ring.draw();
     cam.end();
   }
 

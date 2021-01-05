@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxVideoRecorder.h"
+#include "ring.hpp"
 
 class ofApp : public ofBaseApp{
 
@@ -61,4 +62,6 @@ class ofApp : public ofBaseApp{
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
 
     ofShader shader;
+
+    Ring ring;
 };
