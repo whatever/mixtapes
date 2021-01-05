@@ -192,6 +192,8 @@ void ofApp::draw() {
     shader.setUniformTexture("tex0", fbo.getTexture(), 0);
     shader.setUniformTexture("tex1", bgs[0].getTexture(), 1);
     shader.setUniform1f("alpha", smoothedVol);
+    float t = ((float) getElapsedMillis()) / 1000.0f;
+    shader.setUniform1f("t", t);
     mesh.draw();
     shader.end();
   }
