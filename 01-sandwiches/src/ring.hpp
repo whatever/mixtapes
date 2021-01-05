@@ -8,9 +8,6 @@ class Ring {
 
   public:
 
-    Ring() {
-    };
-
     void update(unsigned int t) {
 
       float ts = ((float) t) / 1000.0f;
