@@ -44,7 +44,10 @@ float lum(vec4 rgba) {
 }
 
 float f(float x, float y) {
-  return (sin(x));
+  return
+    0.5f*(cos(x) + 0.1f)
+    +
+    0.5f*(sin(y) + 0.1f);
 }
 
 vec2 df(float x, float y) {
@@ -54,24 +57,33 @@ vec2 df(float x, float y) {
   return vec2(dx, dy);
 }
 
+#define PI 3.14159265359f
+#define XSCALE (1080.0f / 4.0f / 2.0f / PI / 4)
+#define YSCALE (1920.0f / 4.0f / 2.0f / PI / 4)
+
 // Spearfish
 vec4 spearfish(sampler2DRect target, sampler2DRect mask, vec2 pos) {
 
-  vec2 p;
-  p.x = pos.x / 1080 * 9.0f * 2 * 3.1415;
-  p.y = pos.y / 1920 * 9.0f * 2 * 3.1415;
+  // Move to [0, 1]
+  float x = pos.x / XSCALE;
+  float y = pos.y / YSCALE;
 
-  float z = f(p.x, p.y);
+  // Compute normal vector
+  vec3 h = vec3(0, 0, f(x, y));
+  vec3 df = vec3(df(x, y), 1.0f);
+  vec3 n = normalize(vec3(-df.x, -df.y, 1));
 
-  vec2 dz = normalize(df(p.x, p.y));
-  vec2 n = normalize(vec2(-dz.y, dz.x));
+  // Compute where it hits
+  vec3 d = h + 1.3f*-n;
 
-  // vec2 h = vec2(0.0f, 
-  // z = dot(dz, n);
+  // Move to [w, h]
+  vec2 coord = vec2(0, 0);;
+  coord.x = (x + d.x) * XSCALE;
+  coord.y = (y + d.y) * YSCALE;
 
-  vec2 q = pos + vec2(20.f*z, 0);
+  vec4 col = texture(target, coord);
 
-  return z * texture(mask, q);
+  return col;
 }
 
 // Whiff
@@ -81,6 +93,6 @@ vec4 whiff(sampler2DRect target, sampler2DRect mask, vec2 pos) {
 }
 
 void main() {
-  outputColor = whiff(tex0, tex1, varyingtexcoord);
+  // outputColor = whiff(tex0, tex1, varyingtexcoord);
   outputColor = spearfish(tex0, tex1, varyingtexcoord);
 }

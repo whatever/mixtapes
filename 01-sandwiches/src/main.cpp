@@ -3,8 +3,8 @@
 
 int main() {
   float s = 0.3f;
-  int w = 1080 * s;
-  int h = 1920 * s;
+  int w = 1080 / 4;
+  int h = 1920 / 4;
 
   ofGLFWWindowSettings settings;
   settings.setGLVersion(3, 2);

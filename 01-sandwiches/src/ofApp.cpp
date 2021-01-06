@@ -172,9 +172,14 @@ void ofApp::draw() {
     ofDisableDepthTest();
 
     // Draw video in background
-    ofClear(255, 255, 255, 255);
+    ofClear(0, 0, 0, 255);
     ofSetColor(255, 255, 255);
-    player.draw(0, 0, frameWidth, frameHeight);
+    // player.draw(0, 0, frameWidth, frameHeight);
+
+    ofEnableDepthTest();
+    cam.begin();
+    ring.draw();
+    cam.end();
 
   fbo.end();
 
@@ -185,7 +190,7 @@ void ofApp::draw() {
   t.allocate(frameWidth, frameHeight, GL_RGB);
   t.begin();
 
-  {
+  { // ...
     ofClear(255, 255, 255, 255);
     ofSetColor(255, 255, 255);
     shader.begin();
@@ -201,7 +206,6 @@ void ofApp::draw() {
   { // Draw 3D stuff
     ofEnableDepthTest();
     cam.begin();
-    // box.draw();
     ring.draw();
     cam.end();
   }
@@ -218,12 +222,19 @@ void ofApp::draw() {
 
 ofMesh ofApp::videoMesh(ofTexture tex) {
   ofMesh mesh;
+
   float h = frameHeight;
   float w = frameWidth;
+
   auto nw = tex.getCoordFromPercent(0.0f, 0.0f);
   auto ne = tex.getCoordFromPercent(1.0f, 0.0f);
   auto se = tex.getCoordFromPercent(1.0f, 1.0f);
   auto sw = tex.getCoordFromPercent(0.0f, 1.0f);
+
+  nw = glm::vec2(0, 0);
+  ne = glm::vec2(w, 0);
+  se = glm::vec2(w, h);
+  sw = glm::vec2(0, h);
 
   // 0
   mesh.addVertex(ofPoint(0.0f, 0.0f));
