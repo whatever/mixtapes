@@ -57,31 +57,40 @@ vec2 df(float x, float y) {
   return vec2(dx, dy);
 }
 
+
 #define PI 3.14159265359f
-#define XSCALE (1080.0f / 4.0f / 2.0f / PI / 4)
-#define YSCALE (1920.0f / 4.0f / 2.0f / PI / 4)
+#define XSCALE (1080.0f / 4.0f / 2.0f / PI / 4.0f)
+#define YSCALE (1920.0f / 4.0f / 2.0f / PI / 4.0f)
+
+
+// f
+float f_tex(sampler2DRect tex, vec2 pos) {
+  return lum(texture(tex, pos));
+}
+
+// df
+vec3 df_tex(sampler2DRect tex, vec2 pos) {
+  const float h = 5.0f;
+  float dx = (f_tex(tex, pos+vec2(h, 0)) - f_tex(tex, pos-vec2(h, 0)))/h/2.0f;
+  float dy = (f_tex(tex, pos+vec2(0, h)) - f_tex(tex, pos-vec2(0, h)))/h/2.0f;
+  float x = pos.x / XSCALE;
+  float y = pos.y / YSCALE;
+  return vec3(dx, dy, 1);
+}
 
 // Spearfish
 vec4 spearfish(sampler2DRect target, sampler2DRect mask, vec2 pos) {
 
-  // Move to [0, 1]
-  float x = pos.x / XSCALE;
-  float y = pos.y / YSCALE;
-
   // Compute normal vector
-  vec3 h = vec3(0, 0, f(x, y));
-  vec3 df = vec3(df(x, y), 1.0f);
+  float z = f_tex(mask, pos);
+  vec3 df = df_tex(mask, pos);
   vec3 n = normalize(vec3(-df.x, -df.y, 1));
 
   // Compute where it hits
-  vec3 d = h + 1.3f*-n;
+  vec3 h = vec3(0, 0, z);
+  vec3 d = h + 300.3f*-n;
 
-  // Move to [w, h]
-  vec2 coord = vec2(0, 0);;
-  coord.x = (x + d.x) * XSCALE;
-  coord.y = (y + d.y) * YSCALE;
-
-  vec4 col = texture(target, coord);
+  vec4 col = texture(target, pos.xy + d.xy);
 
   return col;
 }
