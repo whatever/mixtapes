@@ -138,6 +138,7 @@ void ofApp::update(unsigned int t) {
 
   speed = 0.3f + 4.0f*smoothedVol;
   player.setSpeed(speed/2.0f);
+  bgs[0].setSpeed(0.45);
 }
 
 void ofApp::drawFooter() {
@@ -174,17 +175,16 @@ void ofApp::draw() {
     // Draw video in background
     ofClear(0, 0, 0, 255);
     ofSetColor(255, 255, 255);
-    // player.draw(0, 0, frameWidth, frameHeight);
-
-    ofEnableDepthTest();
-    cam.begin();
-    ring.draw();
-    cam.end();
+    player.draw(0, 0, frameWidth, frameHeight);
 
   fbo.end();
 
   ofTexture tex = fbo.getTexture();
   ofMesh mesh = videoMesh(tex);
+
+  // XXX: Recursive Video Editing
+  // XXX: Other software cannot make videos with infinit layers
+  // XXX: So many videos with infinite layers...
 
   ofFbo t;
   t.allocate(frameWidth, frameHeight, GL_RGB);

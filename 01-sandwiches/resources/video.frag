@@ -102,6 +102,6 @@ vec4 whiff(sampler2DRect target, sampler2DRect mask, vec2 pos) {
 }
 
 void main() {
-  // outputColor = whiff(tex0, tex1, varyingtexcoord);
-  outputColor = spearfish(tex0, tex1, varyingtexcoord);
+  outputColor = whiff(tex0, tex1, varyingtexcoord);
+  // outputColor = spearfish(tex0, tex1, varyingtexcoord);
 }
