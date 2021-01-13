@@ -11,3 +11,16 @@ endif
 
 # call the project makefile!
 include $(OF_ROOT)/libs/openFrameworksCompiled/project/makefileCommon/compile.project.mk
+
+.PHONY: Packaged
+Packaged: Release
+	cp resources/* ./bin/$(APPNAME).app/Contents/Resources/.
+
+RunPackaged: Packaged
+	make RunRelease
+
+
+ayyy:
+	rm -fr recorded.mov
+	make RunPackaged
+	open recorded.mov

@@ -3,11 +3,26 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+  // Set data root
+  string newRoot = "../Resources";
+  ofEnableDataPath();
+  ofSetDataPathRoot(newRoot);
+
+  auto audioPath = ofFilePath::getCurrentWorkingDirectory();
+  audioPath = ofFilePath::join(audioPath, "books-of-war.mp3");
+  audioPath = ofFilePath::getAbsolutePath(audioPath);
+  std::cout << "Audio path = " << audioPath << "\n";
+
+  // Audio
+  audioPlayer.load(audioPath);
+  audioPlayer.setLoop(true);
+  audioPlayer.play();
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+  if (player.isLoaded()) {
+  }
 }
 
 //--------------------------------------------------------------
