@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxVideoRecorder.h"
 
 class ofApp : public ofBaseApp{
 
@@ -21,6 +22,18 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
+    void exit(ofEventArgs &args);
+
+		void setupRecorder();
+    void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
+    void audioIn(ofSoundBuffer & input);
+    // void audioIn(float *input, int bufferSize, int nChannels);
+    void setupMicrophone();
+
   protected:
-    ofSoundPlayer audoiPlayer;
+    ofSoundPlayer audioPlayer;
+    ofFbo fbo;
+    ofxVideoRecorder recorder;
+    ofSoundStream soundStreamOutput;
+    ofSoundStream inStream;
 };
