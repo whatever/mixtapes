@@ -6,7 +6,9 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-   ofSetFrameRate(FPS);
+  outBuffer = std::vector<float>(0);
+
+  ofSetFrameRate(FPS);
 
   // Set data root
   string newRoot = "../Resources";
@@ -61,6 +63,23 @@ void ofApp::audioIn(ofSoundBuffer & input) {
   }
 }
 
+/*
+void ofApp::audioOut(ofSoundBuffer &buff) {
+
+  std::cout << "<<< audioIn = " << buff.size() << "\n";
+  // buff.copyTo(lastBuffer, 100, 2);
+
+  for (size_t i = 0; i < buff.getNumFrames(); i++) {
+    std::cout << buff.getSample(i, 0) << " ";
+	}
+  std::cout << "\n";
+
+  lastBuffer = buff;
+
+  std::cout << ">>> audioIn = " << lastBuffer.size() << "\n";
+}
+*/
+
 void ofApp::drawBars(float y_pos, std::vector<float> &ys, float scale) {
 
   if (ys.empty()) {
@@ -69,14 +88,14 @@ void ofApp::drawBars(float y_pos, std::vector<float> &ys, float scale) {
 
   float w = ofGetWidth();
   float h = 100;
-  int width = (ofGetWidth()-100) / buffer.size();
+  int width = (ofGetWidth()) / ys.size();
 
   for (int i=0; i < ys.size(); i++) {
     float x = i*width;
     float y = y_pos;
-    float h = ys[i];
+    float h = ys[i]*scale;
     ofSetColor(255);
-    ofDrawRectangle(x, y, width-1, h*scale);
+    ofDrawRectangle(x, y, width, h);
   }
 }
 
@@ -110,6 +129,19 @@ void ofApp::setupMicrophone() {
   inStream.setup(settings);
   inStream.stop();
   inStream.start();
+
+
+  /* //
+  {
+    ofSoundStreamSettings settings;
+    settings.numOutputChannels = 2;
+    settings.sampleRate = 44100;
+    settings.bufferSize = 512;
+    settings.numBuffers = 4;
+    settings.setOutListener(this);
+    outSoundStream.setup(settings);
+  }
+  // */
 }
 
 void ofApp::exit(ofEventArgs &args) {
@@ -119,8 +151,8 @@ void ofApp::exit(ofEventArgs &args) {
 
 //--------------------------------------------------------------
 void ofApp::update(){
-  ofSoundUpdate();
 
+  ofSoundUpdate();
 
   fbo.begin();
     ofClear(255, 0, 0, 255);
@@ -131,14 +163,9 @@ void ofApp::update(){
   fbo.getTexture().readToPixels(pixels);
   recorder.addFrame(pixels);
 
-  if (audioPlayer.isLoaded()) {
-    int bands = 512;
-    // float *sound = ofSoundGetSpectrum(bands);
-    float sound[512];
 
-    for (int i=0; i < 32; i++) {
-      sound[i] = 0.2;
-    }
+  if (audioPlayer.isLoaded()) {
+    outBuffer = audioPlayer.getCurrentBuffer(512);
   }
 
   // std::cout << recorder.hasAudioError() << ", " << recorder.hasVideoError() << "\n";
@@ -150,6 +177,7 @@ void ofApp::draw(){
 
   drawBars(100, buffer, 100.0f);
   drawBars(300, spectrum, 100.0f);
+  drawBars(500, outBuffer, 100.0f);
 }
 
 void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args) {

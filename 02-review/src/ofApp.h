@@ -1,7 +1,12 @@
 #pragma once
 
+#undef TARGET_OS_IOS
+#undef TARGET_OS_IPHONE
+#define TARGET_OS_MAC 1
+
 #include "ofMain.h"
 #include "ofxVideoRecorder.h"
+#include "ofSoundPlayerExtended.h"
 
 class ofApp : public ofBaseApp{
 
@@ -26,7 +31,10 @@ class ofApp : public ofBaseApp{
 
 		void setupRecorder();
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
+
     void audioIn(ofSoundBuffer & input);
+    // void audioOut(ofSoundBuffer &outBuffer);
+
     // void audioIn(float *input, int bufferSize, int nChannels);
     void setupMicrophone();
 
@@ -34,12 +42,20 @@ class ofApp : public ofBaseApp{
     void drawBars(float, std::vector<float>&, float);
 
   protected:
-    ofSoundPlayer audioPlayer;
+
+
+    ofSoundPlayerExtended audioPlayer;
+
     ofFbo fbo;
     ofxVideoRecorder recorder;
-    ofSoundStream soundStreamOutput;
+    ofSoundStream outSoundStream;
     ofSoundStream inStream;
+
+    ofSoundBuffer lastBuffer;
 
     std::vector<float> buffer;
     std::vector<float> spectrum;
+    std::vector<float> outBuffer;
+
+    std::mutex audioMutex;
 };

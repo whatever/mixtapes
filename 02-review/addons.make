@@ -1,2 +1,4 @@
 ofxPoco
+ofxAudioAnalyzer 
 ofxVideoRecorder
+ofxAudioDecoder
