@@ -24,6 +24,7 @@ void ofApp::setup(){
   // Audio
   audioPlayer.load(audioPath);
   audioPlayer.setLoop(true);
+  audioPlayer.setVolume(0.0);
   audioPlayer.play();
 
   setupMicrophone();
@@ -40,7 +41,7 @@ void ofApp::setupRecorder() {
 
   // Audio
   recorder.setAudioCodec("mp3");
-  recorder.setAudioBitrate("192k");
+  recorder.setAudioBitrate("256k");
 
   // Handler
   ofAddListener(recorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
@@ -50,17 +51,23 @@ void ofApp::setupRecorder() {
 
 void ofApp::audioIn(ofSoundBuffer & input) {
   {
-    buffer = input.getBuffer();
-    recorder.addAudioSamples(&input[0], buffer.size(), input.getNumChannels());
+    auto soundBuffer = audioPlayer.getCurrentSoundBufferMono(256);
+
+    for (int i=0; i < soundBuffer.getNumFrames(); i++) {
+      std::cout << soundBuffer[i] << " ";
+    }
+
+    std::cout << "\n";
+
+    std::cout
+      << soundBuffer.getNumFrames() << " " 
+      << soundBuffer.getNumChannels() << " "
+      << "\n";
+
+    recorder.addAudioSamples(&soundBuffer[0], soundBuffer.getNumFrames(), soundBuffer.getNumChannels());
+    buffer = soundBuffer.getBuffer();
   }
 
-  {
-    float *sound = ofSoundGetSpectrum(512);
-    spectrum = std::vector<float>(512);
-    for (int i=0; i < 512; i++) {
-      spectrum[i] = sound[i];
-    }
-  }
 }
 
 /*
@@ -150,7 +157,7 @@ void ofApp::exit(ofEventArgs &args) {
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void ofApp::update() {
 
   ofSoundUpdate();
 
@@ -163,20 +170,32 @@ void ofApp::update(){
   fbo.getTexture().readToPixels(pixels);
   recorder.addFrame(pixels);
 
+  {
+    auto soundBuffer = audioPlayer.getCurrentSoundBufferMono(512);
+
+    std::cout
+      << soundBuffer.size() << " "
+      << soundBuffer.getNumFrames() << " " 
+      << soundBuffer.getNumChannels() << " "
+      << "\n";
+
+    // recorder.addAudioSamples(&soundBuffer[0], soundBuffer.getNumFrames(), soundBuffer.getNumChannels());
+  }
+
 
   if (audioPlayer.isLoaded()) {
-    outBuffer = audioPlayer.getCurrentBuffer(512);
+    outBuffer = audioPlayer.getCurrentBuffer(256);
   }
 
   // std::cout << recorder.hasAudioError() << ", " << recorder.hasVideoError() << "\n";
+  //
 }
-void ofApp::draw(){
+void ofApp::draw() {
   ofClear(0);
   ofSetColor(255, 0, 0);
   ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
 
   drawBars(100, buffer, 100.0f);
-  drawBars(300, spectrum, 100.0f);
   drawBars(500, outBuffer, 100.0f);
 }
 
