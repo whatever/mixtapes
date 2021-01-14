@@ -30,10 +30,16 @@ class ofApp : public ofBaseApp{
     // void audioIn(float *input, int bufferSize, int nChannels);
     void setupMicrophone();
 
+    // Draw stuff
+    void drawBars(float, std::vector<float>&, float);
+
   protected:
     ofSoundPlayer audioPlayer;
     ofFbo fbo;
     ofxVideoRecorder recorder;
     ofSoundStream soundStreamOutput;
     ofSoundStream inStream;
+
+    std::vector<float> buffer;
+    std::vector<float> spectrum;
 };

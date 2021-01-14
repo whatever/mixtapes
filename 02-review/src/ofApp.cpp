@@ -47,8 +47,37 @@ void ofApp::setupRecorder() {
 }
 
 void ofApp::audioIn(ofSoundBuffer & input) {
-  auto buffer = input.getBuffer();
-  recorder.addAudioSamples(&input[0], buffer.size(), input.getNumChannels());
+  {
+    buffer = input.getBuffer();
+    recorder.addAudioSamples(&input[0], buffer.size(), input.getNumChannels());
+  }
+
+  {
+    float *sound = ofSoundGetSpectrum(512);
+    spectrum = std::vector<float>(512);
+    for (int i=0; i < 512; i++) {
+      spectrum[i] = sound[i];
+    }
+  }
+}
+
+void ofApp::drawBars(float y_pos, std::vector<float> &ys, float scale) {
+
+  if (ys.empty()) {
+    return;
+  }
+
+  float w = ofGetWidth();
+  float h = 100;
+  int width = (ofGetWidth()-100) / buffer.size();
+
+  for (int i=0; i < ys.size(); i++) {
+    float x = i*width;
+    float y = y_pos;
+    float h = ys[i];
+    ofSetColor(255);
+    ofDrawRectangle(x, y, width-1, h*scale);
+  }
 }
 
 void ofApp::setupMicrophone() {
@@ -114,65 +143,26 @@ void ofApp::update(){
 
   // std::cout << recorder.hasAudioError() << ", " << recorder.hasVideoError() << "\n";
 }
-
-//--------------------------------------------------------------
 void ofApp::draw(){
+  ofClear(0);
+  ofSetColor(255, 0, 0);
+  ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+
+  drawBars(100, buffer, 100.0f);
+  drawBars(300, spectrum, 100.0f);
 }
 
 void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args) {
 }
 
-//--------------------------------------------------------------
-void ofApp::keyPressed(int key){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
-
-}
+void ofApp::keyPressed(int key){ }
+void ofApp::keyReleased(int key){ }
+void ofApp::mouseMoved(int x, int y ){ }
+void ofApp::mouseDragged(int x, int y, int button){ }
+void ofApp::mousePressed(int x, int y, int button){ }
+void ofApp::mouseReleased(int x, int y, int button){ }
+void ofApp::mouseEntered(int x, int y){ }
+void ofApp::mouseExited(int x, int y){ }
+void ofApp::windowResized(int w, int h){ }
+void ofApp::gotMessage(ofMessage msg){ }
+void ofApp::dragEvent(ofDragInfo dragInfo){ }
